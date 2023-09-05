@@ -1,7 +1,7 @@
 const BLOCKEDCHECKRUN = "__blocked_check_run";
 
 // // Set DEBUG based on the URL parameter
-const DEBUG = false;
+let DEBUG = false;
 const url = window.location.href;
 const urlObj = new URL(url);
 const debugParam = urlObj.searchParams.get('debug');
