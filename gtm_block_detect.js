@@ -128,6 +128,7 @@ function main() {
   const blockCheckAlreadyRun = localStorage.getItem(BLOCKEDCHECKRUN);
   if (DEBUG)
     console.log("Value of blockCheckAlreadyRun: ", blockCheckAlreadyRun);
+  // Bail if we've already run the test. Only run once per client so that we aren't loading an extra GTM container on all page loads
   if (!blockCheckAlreadyRun) {
     window.dataLayerEx = window.dataLayerEx || [];
     (function (w, d, s, l, i) {
