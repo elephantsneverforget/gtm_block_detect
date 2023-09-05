@@ -65,7 +65,7 @@ const __gtm_checks = (function () {
       // Check if ics values are updated on main data layer after consent push
       gtag("consent", "default", { security_storage: "granted" });
 
-      // Wait for 500 ms
+      // Wait for 500 ms. There may be some delay in GTM updating ICS values
       await delay(500);
 
       const data = window.google_tag_data?.ics?.entries;
