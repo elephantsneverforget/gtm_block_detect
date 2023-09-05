@@ -1,5 +1,14 @@
 const BLOCKEDCHECKRUN = "__blocked_check_run";
+
+// // Set DEBUG based on the URL parameter
 const DEBUG = false;
+const url = window.location.href;
+const urlObj = new URL(url);
+const debugParam = urlObj.searchParams.get('debug');
+if (debugParam !== null) {
+  DEBUG = debugParam.toLowerCase() === 'true';
+}
+
 const __gtm_checks = (function () {
   function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -7,10 +16,9 @@ const __gtm_checks = (function () {
     if (parts.length === 2) return parts.pop().split(";").shift();
   }
 
-  async function storeResultInFirestore(shimmingDetected, blockingDetected) {
+  async function storeResultInFirestore(shimmingDetected, blockingDetected, shopifyY) {
     const userAgent = navigator.userAgent;
     const domain = window.location.hostname; // Getting the domain
-    const shopifyY = getCookie("_shopify_y");
     const firestoreUrl = `https://firestore.googleapis.com/v1/projects/gtm-ad-block-testing-sep-2023/databases/(default)/documents/users?documentId=${shopifyY}`;
     const headers = {
       "Content-Type": "application/json",
@@ -74,6 +82,7 @@ const __gtm_checks = (function () {
       }
     } catch (error) {
       if (DEBUG) console.error(error);
+      return false;
     }
   }
 
@@ -85,6 +94,7 @@ const __gtm_checks = (function () {
       return result.bot;
     } catch (error) {
       if (DEBUG) console.error(error);
+      return false;
     }
   }
 
@@ -104,7 +114,7 @@ const __gtm_checks = (function () {
     if (DEBUG) console.log("Shimming was detected: ", shimmingWasDetected);
     localStorage.setItem(BLOCKEDCHECKRUN, true);
     if (DEBUG) console.log("Setting blocked check run to true");
-    storeResultInFirestore(shimmingWasDetected, gtmBlockedOnLoad);
+    storeResultInFirestore(shimmingWasDetected, gtmBlockedOnLoad, shopifyY);
     return;
   }
 
