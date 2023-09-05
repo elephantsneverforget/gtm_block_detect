@@ -99,6 +99,7 @@ const __gtm_checks = (function () {
   }
 
   async function gtmBlockedChecks(gtmHasLoaded) {
+    if (DEBUG) debugger;
     const shopifyY = getCookie("_shopify_y");
     if (DEBUG) console.log("_shopify_y is", shopifyY);
     const botWasDetected = await botDetected();
