@@ -1,4 +1,3 @@
-# gtm_block_detect
-Detect if GTM is being blocked/shimmed
-- Script on jsdelivr
+# Detect GTM Blocking & Shimming
+- Script hosted on jsdelivr
 - include in head
