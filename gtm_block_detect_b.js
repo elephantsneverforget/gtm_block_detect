@@ -60,7 +60,7 @@ const __gtm_checks = (function () {
       // Attempt to push consent states
       if (DEBUG) console.log("GTM consent entry value", window.google_tag_data?.ics?.entries);
       function gtag() {
-        dataLayer.push(arguments);
+        dataLayerEx.push(arguments);
       }
       // Check if ics values are updated on main data layer after consent push
       gtag("consent", "default", { security_storage: "granted" });
