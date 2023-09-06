@@ -4,9 +4,9 @@ const BLOCKEDCHECKRUN = "__blocked_check_run";
 let DEBUG = false;
 const url = window.location.href;
 const urlObj = new URL(url);
-const debugParam = urlObj.searchParams.get('debug');
+const debugParam = urlObj.searchParams.get("debug");
 if (debugParam !== null) {
-  DEBUG = debugParam.toLowerCase() === 'true';
+  DEBUG = debugParam.toLowerCase() === "true";
 }
 
 const __gtm_checks = (function () {
@@ -16,7 +16,11 @@ const __gtm_checks = (function () {
     if (parts.length === 2) return parts.pop().split(";").shift();
   }
 
-  async function storeResultInFirestore(shimmingDetected, blockingDetected, shopifyY) {
+  async function storeResultInFirestore(
+    shimmingDetected,
+    blockingDetected,
+    shopifyY
+  ) {
     const userAgent = navigator.userAgent;
     const domain = window.location.hostname; // Getting the domain
     const firestoreUrl = `https://firestore.googleapis.com/v1/projects/gtm-ad-block-testing-sep-2023/databases/(default)/documents/users?documentId=${shopifyY}`;
@@ -52,38 +56,10 @@ const __gtm_checks = (function () {
   }
 
   async function shimmingDetected() {
-    try {
-      if (!window.google_tag_manager || !window.google_tag_manager.dataLayerEx) return true;
-
-      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-      // Attempt to push consent states
-      if (DEBUG) console.log("GTM consent entry value", window.google_tag_data?.ics?.entries);
-      function gtag() {
-        dataLayerEx.push(arguments);
-      }
-      // Check if ics values are updated on main data layer after consent push
-      gtag("consent", "default", { security_storage: "granted" });
-
-      // Wait for 500 ms. There may be some delay in GTM updating ICS values
-      await delay(500);
-
-      const data = window.google_tag_data?.ics?.entries;
-      if (
-        data !== undefined &&
-        Object.keys(data).length > 0 &&
-        data?.security_storage?.default === true
-      ) {
-        if (DEBUG) console.log("No shimming detected");
-        return false;
-      } else {
-        if (DEBUG) console.log("Shimming detected");
-        return true;
-      }
-    } catch (error) {
-      if (DEBUG) console.error(error);
-      return false;
-    }
+    // try {
+    if (!window.google_tag_manager || !window.google_tag_manager.dataLayerEx)
+      return true;
+    return false;
   }
 
   async function botDetected() {
