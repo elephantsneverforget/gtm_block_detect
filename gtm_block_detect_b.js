@@ -56,7 +56,6 @@ const __gtm_checks = (function () {
   }
 
   async function shimmingDetected() {
-    // try {
     if (!window.google_tag_manager || !window.google_tag_manager.dataLayerEx)
       return true;
     return false;
@@ -106,6 +105,7 @@ function main() {
   if (DEBUG)
     console.log("Value of blockCheckAlreadyRun: ", blockCheckAlreadyRun);
   // Bail if we've already run the test. Only run once per client so that we aren't loading an extra GTM container on all page loads
+  // Load generic GTM container so we aren't messing with the original GTM container
   if (!blockCheckAlreadyRun) {
     window.dataLayerEx = window.dataLayerEx || [];
     (function (w, d, s, l, i) {
