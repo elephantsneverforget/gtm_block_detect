@@ -19,7 +19,8 @@ const __gtm_checks = (function () {
   async function storeResultInFirestore(
     shimmingDetected,
     blockingDetected,
-    shopifyY
+    shopifyY,
+    privateBrowsingDetected
   ) {
     const userAgent = navigator.userAgent;
     const domain = window.location.hostname; // Getting the domain
@@ -32,6 +33,7 @@ const __gtm_checks = (function () {
       fields: {
         shimmingDetected: { booleanValue: shimmingDetected },
         blockingDetected: { booleanValue: blockingDetected },
+        privateBrowsingDetected: { stringValue: privateBrowsingDetected },
         userAgent: { stringValue: userAgent },
         domain: { stringValue: domain },
       },
@@ -61,6 +63,31 @@ const __gtm_checks = (function () {
     return false;
   }
 
+  async function detectPrivateBrowsing() {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src =
+        "https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@v1.3.0/dist/es5/detectIncognito.min.js";
+
+      script.onload = async function () {
+        try {
+          const result = await detectIncognito();
+          resolve(result.isPrivate);
+        } catch (error) {
+          console.error("Error calling detectIncognito:", error);
+          resolve(`Error calling detectIncognito: ${error}`);
+        }
+      };
+
+      script.onerror = function (error) {
+        console.error("Failed to load the script.");
+        resolve(`Failed to load the script: ${error}`);
+      };
+
+      document.head.appendChild(script);
+    });
+  }
+
   async function botDetected() {
     try {
       const BotdModule = await import("https://openfpcdn.io/botd/v1");
@@ -73,6 +100,7 @@ const __gtm_checks = (function () {
     }
   }
 
+  // Detect if GTM was blocked or shimmed
   async function gtmBlockedChecks(gtmHasLoaded) {
     if (DEBUG) debugger;
     const shopifyY = getCookie("_shopify_y");
@@ -84,13 +112,21 @@ const __gtm_checks = (function () {
       return;
     }
 
+    // Detect private browsing mode
+    const privateBrowsingData = await detectPrivateBrowsing();
+
     const gtmBlockedOnLoad = !gtmHasLoaded;
     if (DEBUG) console.log("GTM was blocked on load: ", gtmBlockedOnLoad);
     const shimmingWasDetected = await shimmingDetected();
     if (DEBUG) console.log("Shimming was detected: ", shimmingWasDetected);
     localStorage.setItem(BLOCKEDCHECKRUN, true);
     if (DEBUG) console.log("Setting blocked check run to true");
-    storeResultInFirestore(shimmingWasDetected, gtmBlockedOnLoad, shopifyY);
+    storeResultInFirestore(
+      shimmingWasDetected,
+      gtmBlockedOnLoad,
+      shopifyY,
+      privateBrowsingData
+    );
     return;
   }
 
@@ -101,6 +137,7 @@ const __gtm_checks = (function () {
 window.__gtm_checks = __gtm_checks;
 
 function main() {
+  if (DEBUG) localStorage.removeItem(BLOCKEDCHECKRUN);
   const blockCheckAlreadyRun = localStorage.getItem(BLOCKEDCHECKRUN);
   if (DEBUG)
     console.log("Value of blockCheckAlreadyRun: ", blockCheckAlreadyRun);
