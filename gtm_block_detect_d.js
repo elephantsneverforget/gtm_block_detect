@@ -72,7 +72,7 @@ const __gtm_checks = (function () {
       script.onload = async function () {
         try {
           const result = await detectIncognito();
-          resolve(result.isPrivate);
+          resolve(result.isPrivate ? "true" : "false");
         } catch (error) {
           console.error("Error calling detectIncognito:", error);
           resolve(`Error calling detectIncognito: ${error}`);
@@ -113,7 +113,7 @@ const __gtm_checks = (function () {
     }
 
     // Detect private browsing mode
-    const privateBrowsingData = await detectPrivateBrowsing();
+    const privateBrowsingDetected = await detectPrivateBrowsing();
 
     const gtmBlockedOnLoad = !gtmHasLoaded;
     if (DEBUG) console.log("GTM was blocked on load: ", gtmBlockedOnLoad);
@@ -125,7 +125,7 @@ const __gtm_checks = (function () {
       shimmingWasDetected,
       gtmBlockedOnLoad,
       shopifyY,
-      privateBrowsingData
+      privateBrowsingDetected
     );
     return;
   }
